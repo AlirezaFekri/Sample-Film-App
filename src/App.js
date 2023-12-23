@@ -3,9 +3,10 @@ import NavBar from "./components/navBar";
 import Main from "./components/main";
 import Search from './components/search'
 import NumResults from './components/numresults'
-import ListBox from './components/listBox'
-import WatchedBox from './components/watchedBox'
+import Box from './components/box'
 import MovieList from "./components/movieList";
+import WatchedMovieList from './components/watchedmovieList'
+import WatchedSummary from './components/watchedSummary'
 
 const tempMovieData = [
   {
@@ -70,10 +71,13 @@ export default function App() {
       </NavBar>
 
       <Main >
-        <ListBox>
+        <Box>
           <MovieList movies={movies} />
-        </ListBox>
-        <WatchedBox watched={watched} />
+        </Box>
+        <Box>
+          <WatchedSummary watched={watched} />
+          <WatchedMovieList watched={watched} />
+        </Box>
       </Main>
 
     </>
