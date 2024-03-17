@@ -4,12 +4,29 @@ import Loader from './loader';
 import StarRating from './starRating'
 
 
-function MovieDetails({ selectedId, onCloseMovie, apiKey }) {
+function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched }) {
     const [moveDetails, setMovieDetails] = useState({});
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [rate, setRate] = useState(0);
+
     const { Title: title, Year: year, Poster: poster, Runtime: runtime, imdbRating, Plot: plot, Released: released, Actors: actors, Director: director, Genre: genre } = moveDetails;
+
+    function handleAdd() {
+        const newWatchedMovie = {
+            imdbID: selectedId,
+            title,
+            poster,
+            year,
+            imdbRating: Number(imdbRating),
+            runtime: Number(runtime.split(' ').at(0)),
+            userRating: rate
+
+        }
+        onAddWatched(newWatchedMovie);
+        onCloseMovie();
+    }
+
     useEffect(() => {
         const fetchMovie = async () => {
             try {
@@ -28,30 +45,41 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey }) {
         }
         fetchMovie();
     }, [selectedId])
+
     return (<>
         {error && <ErrorMessage message={error} />}
         {isLoading && <Loader>Loading...</Loader>}
         {!error && !isLoading &&
             <div className='details'>
+
                 <header>
                     <button className='btn-back' onClick={onCloseMovie} >&larr;</button>
+
                     <img src={poster} alt='movie cover' />
+
                     <div className='details-overview'>
+
                         <h2>{title}</h2>
                         <p>{released} &bull; {runtime} </p>
                         <p>{genre}</p>
                         <p><span>⭐</span> {imdbRating} IMDb Rating</p>
+
                     </div>
                 </header>
+
                 <section>
+
                     <div className='rating'>
-                        <StarRating maxRating={10} size={24} onSetRating={setRate} defaultRaing={imdbRating} />
+                        <StarRating maxRating={10} size={24} onSetRating={setRate} />
+                        <button className='btn-add' onClick={handleAdd} >+Add to List</button>
                     </div>
+
                     <p>
                         <em>{plot}</em>
                     </p>
                     <p>Starring {actors}</p>
                     <p>Directed by {director}</p>
+
                 </section>
             </div>
         }

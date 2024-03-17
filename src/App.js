@@ -27,6 +27,14 @@ export default function App() {
   function handleCloseMovie() {
     setSelectedId(null)
   }
+  function handleAddWatched(movie) {
+    if (watched.length === 0) {
+      setWatched(watched => [...watched, movie])
+      return
+    }
+    watched?.map(vid => vid.imdbID === movie.imdbID ? vid.userRating === movie.userRating ? <></> : vid.userRating = movie.userRating : setWatched(watched => [...watched, movie]))
+
+  }
 
   useEffect(() => {
     const fetschMovie = async () => {
@@ -87,7 +95,7 @@ export default function App() {
         </Box>
         <Box>
           {
-            selectedId ? <MovieDetails selectedId={selectedId} apiKey={KEY} onCloseMovie={handleCloseMovie} /> :
+            selectedId ? <MovieDetails selectedId={selectedId} apiKey={KEY} onAddWatched={handleAddWatched} onCloseMovie={handleCloseMovie} /> :
               <>
                 <WatchedSummary watched={watched} />
                 <WatchedMovieList watched={watched} />
