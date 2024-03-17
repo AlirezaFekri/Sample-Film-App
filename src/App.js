@@ -76,16 +76,6 @@ export default function App() {
       </NavBar>
 
       <Main >
-        {/* <Box element={<MovieList movies={movies} />} />
-        <Box
-          element={
-            <>
-              <WatchedSummary watched={watched} />
-              <WatchedMovieList watched={watched} />
-            </>
-          }
-        /> */}
-
         <Box>
           {isLoading && <Loader>Loading...</Loader>}
           {!isLoading && !error && <MovieList onSelectMovie={handleSelectMovie} movies={movies} />}

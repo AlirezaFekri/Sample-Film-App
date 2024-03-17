@@ -47,6 +47,12 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched 
         }
         fetchMovie();
     }, [selectedId])
+    useEffect(() => {
+        if (!title) return;
+        document.title = `Movie | ${title}`;
+        //clean up Effect function
+        return () => document.title = `usePopcorn`;
+    }, [title])
 
     return (<>
         {error && <ErrorMessage message={error} />}
