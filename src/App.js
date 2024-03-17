@@ -22,13 +22,18 @@ export default function App() {
   useEffect(() => {
     const fetschMovie = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
+        setError("")
+        if (query === "")
+          throw new Error("Please Enter Movie name(3 charcter)")
+        console.log(query);
         const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`);
+
         if (!res.ok)
           throw new Error("Network Error!")
         const data = await res.json();
-        if (data.Response === 'False')
-          throw new Error("Video not Found!")
+        if (data.Response === "False")
+          throw new Error("Video not Found!");
         setMovies(data.Search);
       } catch (err) {
         setError(err.message);
@@ -36,6 +41,12 @@ export default function App() {
         setIsLoading(false);
       }
     }
+    if (query.length < 3) {
+      setError("")
+      setMovies([]);
+
+    }
+
     fetschMovie();
     // .then(res => res.json())
     // .then(data => setMovies(data.Search))
