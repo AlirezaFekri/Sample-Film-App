@@ -4,11 +4,13 @@ import Loader from './loader';
 import StarRating from './starRating'
 
 
-function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched }) {
+function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched }) {
     const [moveDetails, setMovieDetails] = useState({});
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [rate, setRate] = useState(0);
+    const isWatched = watched.map(vid => vid.imdbID).includes(selectedId);
+    const watchedUserRating = watched.find(movie => movie.imdbID === selectedId)?.userRating;
 
     const { Title: title, Year: year, Poster: poster, Runtime: runtime, imdbRating, Plot: plot, Released: released, Actors: actors, Director: director, Genre: genre } = moveDetails;
 
@@ -70,8 +72,15 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched }) {
                 <section>
 
                     <div className='rating'>
-                        <StarRating maxRating={10} size={24} onSetRating={setRate} />
-                        <button className='btn-add' onClick={handleAdd} >+Add to List</button>
+                        {
+                            !isWatched ?
+                                <>
+                                    <StarRating maxRating={10} size={24} onSetRating={setRate} />
+                                    {rate > 0 && <button className='btn-add' onClick={handleAdd} >+Add to List</button>}
+                                </> :
+                                <p>You rated this movie <span>⭐</span> {watchedUserRating}</p>
+
+                        }
                     </div>
 
                     <p>

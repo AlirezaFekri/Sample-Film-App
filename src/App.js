@@ -28,12 +28,10 @@ export default function App() {
     setSelectedId(null)
   }
   function handleAddWatched(movie) {
-    if (watched.length === 0) {
-      setWatched(watched => [...watched, movie])
-      return
-    }
-    watched?.map(vid => vid.imdbID === movie.imdbID ? vid.userRating === movie.userRating ? <></> : vid.userRating = movie.userRating : setWatched(watched => [...watched, movie]))
-
+    setWatched(watched => [...watched, movie])
+  }
+  function handleDeleteWatched(id) {
+    setWatched(watched => watched.filter(vid => vid.imdbID !== id));
   }
 
   useEffect(() => {
@@ -95,10 +93,10 @@ export default function App() {
         </Box>
         <Box>
           {
-            selectedId ? <MovieDetails selectedId={selectedId} apiKey={KEY} onAddWatched={handleAddWatched} onCloseMovie={handleCloseMovie} /> :
+            selectedId ? <MovieDetails watched={watched} selectedId={selectedId} apiKey={KEY} onAddWatched={handleAddWatched} onCloseMovie={handleCloseMovie} /> :
               <>
                 <WatchedSummary watched={watched} />
-                <WatchedMovieList watched={watched} />
+                <WatchedMovieList onDeleteWatched={handleDeleteWatched} watched={watched} />
               </>
           }
         </Box>
