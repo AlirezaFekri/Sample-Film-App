@@ -30,22 +30,29 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched 
     }
 
     useEffect(() => {
+        const controller = new AbortController();
         const fetchMovie = async () => {
             try {
                 setIsLoading(true);
                 setError("");
-                const res = await fetch(`http://www.omdbapi.com/?apikey=${apiKey}&i=${selectedId}`);
+                const res = await fetch(`http://www.omdbapi.com/?apikey=${apiKey}&i=${selectedId}`, { signal: controller.signal });
                 if (!res.ok)
                     throw new Error("Network Error! Please check ypur internet connection.");
                 const data = await res.json();
                 setMovieDetails(data);
+                setError("");
             } catch (err) {
-                setError(err.message)
+                if (err.message !== "AbortError")
+                    setError(err.message)
             } finally {
                 setIsLoading(false)
             }
         }
         fetchMovie();
+        onCloseMovie();
+        return function () {
+            controller.abort();
+        }
     }, [selectedId])
     useEffect(() => {
         if (!title) return;
@@ -53,6 +60,17 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched 
         //clean up Effect function
         return () => document.title = `usePopcorn`;
     }, [title])
+    useEffect(() => {
+        const callback = (e) => {
+            if (e.code === "Escape") {
+                onCloseMovie();
+            }
+        };
+        document.addEventListener("keydown", callback)
+        return function () {
+            document.removeEventListener("keydown", callback)
+        }
+    }, [onCloseMovie])
 
     return (<>
         {error && <ErrorMessage message={error} />}

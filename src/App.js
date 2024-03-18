@@ -13,7 +13,7 @@ import MovieDetails from "./components/MovieDetails";
 
 
 export default function App() {
-  const [query, setQuery] = useState("interstellar");
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
@@ -35,14 +35,16 @@ export default function App() {
   }
 
   useEffect(() => {
+    const controller = new AbortController;
+
     const fetschMovie = async () => {
       try {
         setIsLoading(true);
         setError("")
         if (query === "")
           throw new Error("Please Enter Movie name(3 charcter)")
-        console.log(query);
-        const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`);
+
+        const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`, { signal: controller.signal });
 
         if (!res.ok)
           throw new Error("Network Error!")
@@ -50,8 +52,10 @@ export default function App() {
         if (data.Response === "False")
           throw new Error("Video not Found!");
         setMovies(data.Search);
+        setError("")
       } catch (err) {
-        setError(err.message);
+        if (err.message !== "AbortError")
+          setError(err.message);
       } finally {
         setIsLoading(false);
       }
@@ -63,9 +67,15 @@ export default function App() {
     }
 
     fetschMovie();
+    return function () {
+      controller.abort();
+    }
+
+
     // .then(res => res.json())
     // .then(data => setMovies(data.Search))
   }, [query])
+
 
 
   return (
