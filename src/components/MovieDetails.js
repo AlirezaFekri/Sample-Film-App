@@ -49,7 +49,6 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched 
             }
         }
         fetchMovie();
-        onCloseMovie();
         return function () {
             controller.abort();
         }
