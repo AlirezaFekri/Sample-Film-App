@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ErrorMessage from './errorMessage';
 import Loader from './loader';
 import StarRating from './starRating'
+import { useKey } from '../hooks/useKey';
 
 
 function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched }) {
@@ -9,6 +10,7 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched 
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [rate, setRate] = useState(0);
+    const countRating = useRef([]);
     const isWatched = watched.map(vid => vid.imdbID).includes(selectedId);
     const watchedUserRating = watched.find(movie => movie.imdbID === selectedId)?.userRating;
 
@@ -22,12 +24,19 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched 
             year,
             imdbRating: Number(imdbRating),
             runtime: Number(runtime.split(' ').at(0)),
-            userRating: rate
+            userRating: rate,
+            userConutChangeRate: countRating
 
         }
         onAddWatched(newWatchedMovie);
         onCloseMovie();
     }
+
+    useEffect(() => {
+        const count = countRating.current.length + 1;
+        countRating.current = [...countRating.current, { times: count, rated: rate }]
+        console.log(countRating);
+    }, [rate])
 
     useEffect(() => {
         const controller = new AbortController();
@@ -52,24 +61,15 @@ function MovieDetails({ selectedId, onCloseMovie, apiKey, onAddWatched, watched 
         return function () {
             controller.abort();
         }
-    }, [selectedId])
+    }, [selectedId, apiKey])
     useEffect(() => {
         if (!title) return;
         document.title = `Movie | ${title}`;
         //clean up Effect function
         return () => document.title = `usePopcorn`;
     }, [title])
-    useEffect(() => {
-        const callback = (e) => {
-            if (e.code === "Escape") {
-                onCloseMovie();
-            }
-        };
-        document.addEventListener("keydown", callback)
-        return function () {
-            document.removeEventListener("keydown", callback)
-        }
-    }, [onCloseMovie])
+    
+    useKey("escape", onCloseMovie)
 
     return (<>
         {error && <ErrorMessage message={error} />}
